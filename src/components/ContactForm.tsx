@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BookingCta } from "@/components/BookingLink";
 
 interface ContactFormProps {
   products: { slug: string; name: string }[];
@@ -45,6 +46,10 @@ export function ContactForm({
           </a>{" "}
           directly with your inquiry.
         </p>
+        <BookingCta
+          label="Or book a pilot call"
+          className="mt-4 inline-block text-sm font-medium text-ember hover:underline"
+        />
         <button
           type="button"
           onClick={() => setSubmitted(false)}

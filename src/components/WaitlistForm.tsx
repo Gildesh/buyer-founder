@@ -2,6 +2,7 @@
 
 import { useState, type CSSProperties } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { BookingCta } from "@/components/BookingLink";
 import { products } from "@/lib/products";
 import { WAITLIST_PLANS } from "@/lib/waitlist";
 import { readUtmFromCookies } from "@/lib/utm";
@@ -95,6 +96,19 @@ export function WaitlistForm({
         <p style={{ marginTop: 8, fontSize: 14, color: "#8a8278" }}>
           We will email when the next tool is actually usable — not when a catalog card ships.
         </p>
+        <BookingCta
+          label="Book a pilot call"
+          style={{
+            display: "inline-block",
+            marginTop: 20,
+            borderRadius: 999,
+            border: "1px solid #2a2622",
+            color: "#e8a54b",
+            padding: "10px 18px",
+            fontSize: 14,
+            textDecoration: "none",
+          }}
+        />
       </div>
     );
   }

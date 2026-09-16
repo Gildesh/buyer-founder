@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BookingCta } from "@/components/BookingLink";
 import { ContactForm } from "@/components/ContactForm";
+import { getBookingUrl } from "@/lib/booking";
 import { products } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -16,6 +18,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const preselectedProduct = params.product ?? "";
   const preselectedPlan = params.plan ?? "";
+  const bookingUrl = getBookingUrl();
 
   return (
     <div className="pt-28 pb-20">
@@ -37,6 +40,18 @@ export default async function ContactPage({ searchParams }: PageProps) {
             </p>
 
             <div className="mt-10 space-y-6">
+              {bookingUrl ? (
+                <div className="rounded-xl border border-ember/30 bg-surface-raised p-5">
+                  <h2 className="font-medium text-paper">Book a call</h2>
+                  <p className="mt-2 text-sm text-muted">
+                    Scoped pilots and freelance artifacts — pick a time instead of waiting on email.
+                  </p>
+                  <BookingCta
+                    label="Schedule a pilot call"
+                    className="mt-4 inline-block rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-ink hover:bg-ember-dim"
+                  />
+                </div>
+              ) : null}
               <div className="rounded-xl border border-border bg-surface-raised p-5">
                 <h2 className="font-medium text-paper">Waitlist</h2>
                 <p className="mt-2 text-sm text-muted">
