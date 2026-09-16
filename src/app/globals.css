@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-ink: #0c0b0a;
+  --color-paper: #f5f0e8;
+  --color-muted: #8a8278;
+  --color-border: #2a2622;
+  --color-surface: #141210;
+  --color-surface-raised: #1c1916;
+  --color-ember: #e8a54b;
+  --color-ember-dim: #b87d2e;
+  --font-family-display: var(--font-display), Georgia, serif;
+  --font-family-body: var(--font-body), system-ui, sans-serif;
+}
+
+/* Base — plain CSS so the site never renders unstyled */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #0c0b0a;
+  color: #f5f0e8;
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: color-mix(in srgb, #e8a54b 40%, transparent);
+  color: #f5f0e8;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+/* Product icon containers — fixed size, never blow up */
+.product-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #141210;
+  border: 1px solid #2a2622;
+}
+
+.product-icon--sm {
+  width: 40px;
+  height: 40px;
+  padding: 6px;
+}
+
+.product-icon--md {
+  width: 56px;
+  height: 56px;
+  padding: 8px;
+}
+
+.product-icon--lg {
+  width: 72px;
+  height: 72px;
+  padding: 10px;
+}
+
+.product-icon--xl {
+  width: 96px;
+  height: 96px;
+  padding: 12px;
+}
+
+.product-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+@layer utilities {
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #f5f0e8 0%, #e8a54b 50%, #d4622a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-ember {
+    box-shadow: 0 0 80px -20px color-mix(in srgb, #e8a54b 35%, transparent);
+  }
+}

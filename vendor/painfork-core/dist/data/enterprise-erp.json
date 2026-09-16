@@ -1,0 +1,69 @@
+{
+  "vertical": "enterprise-erp",
+  "pains": [
+    {
+      "id": "erp-meso-go-live-failure",
+      "statement": "Order-to-cash or inventory go-live caused shipment freezes and manual order re-entry under executive deadline pressure.",
+      "grain": "meso",
+      "category": "cutover",
+      "suggestedEvidence": "Name go-live date, slips, and first production process that failed (shipment, invoice, allocation).",
+      "contextTags": ["erp", "sap", "cutover", "supply chain"]
+    },
+    {
+      "id": "erp-macro-integration-debt",
+      "statement": "Dozens of WMS, EDI, and CRM adapters were discovered late—integrations entered UAT without parallel-run time.",
+      "grain": "macro",
+      "category": "interface",
+      "suggestedEvidence": "Count production adapters; name one that failed in week one post go-live.",
+      "contextTags": ["integration", "wms", "edi", "erp"]
+    },
+    {
+      "id": "erp-micro-field-collision",
+      "statement": "Product or pricing fields migrated with different commercial meaning in the new ERP, causing silent allocation errors.",
+      "grain": "micro",
+      "category": "schema",
+      "suggestedEvidence": "Give one field pair and the downstream report or fulfillment error.",
+      "contextTags": ["schema", "sap", "master data"]
+    },
+    {
+      "id": "erp-meso-manual-rekey",
+      "statement": "Regional ops manually reconciles ERP inventory against warehouse truth because batch interfaces disagree.",
+      "grain": "meso",
+      "category": "interface",
+      "suggestedEvidence": "Hours per week spent re-keying; which SKU family or region.",
+      "contextTags": ["integration", "warehouse", "batch"]
+    },
+    {
+      "id": "erp-macro-no-wedge",
+      "statement": "Leadership funded a global ERP program but cannot name a bounded stabilization deliverable after go-live failure.",
+      "grain": "macro",
+      "category": "visibility",
+      "suggestedEvidence": "Quote the transformation mandate vs what is actually funded this quarter.",
+      "contextTags": ["strategy", "erp"]
+    },
+    {
+      "id": "erp-meso-customization-debt",
+      "statement": "Excessive ERP customization makes every upgrade and patch a multi-month regression event.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Count custom objects or change orders; last upgrade duration.",
+      "contextTags": ["sap", "customization", "vendor"]
+    },
+    {
+      "id": "erp-macro-cutover-terror",
+      "statement": "A second big-bang cutover is politically impossible after the first production failure.",
+      "grain": "macro",
+      "category": "cutover",
+      "suggestedEvidence": "Past rollback story or executive 'no outage window' memo.",
+      "contextTags": ["cutover", "risk"]
+    },
+    {
+      "id": "erp-meso-reporting-lag",
+      "statement": "Finance close and ops reporting lag because extracts from the new ERP disagree with legacy subledgers.",
+      "grain": "meso",
+      "category": "performance",
+      "suggestedEvidence": "Close cycle extension; which report pair disagrees.",
+      "contextTags": ["reporting", "analytics", "erp"]
+    }
+  ]
+}

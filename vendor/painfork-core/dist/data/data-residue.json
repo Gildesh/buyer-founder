@@ -1,0 +1,69 @@
+{
+  "vertical": "data-residue",
+  "pains": [
+    {
+      "id": "dr-meso-doc-corpus",
+      "statement": "Critical rules live in PDFs, scans, and email threads that auditors cannot search under deadline.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Deadline missed; corpus type and search failure story.",
+      "contextTags": ["documents", "pdf", "compliance"]
+    },
+    {
+      "id": "dr-meso-unsearchable-archive",
+      "statement": "Municipal or legal archives are scanned but not indexed with reliable OCR or citations.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Query that failed; volume of corpus.",
+      "contextTags": ["documents", "pdf", "municipal"]
+    },
+    {
+      "id": "dr-macro-compliance-fail",
+      "statement": "Compliance cannot produce cited answers from unstructured residue when regulators ask.",
+      "grain": "macro",
+      "category": "knowledge",
+      "suggestedEvidence": "Regulation, finding, artifact auditors requested.",
+      "contextTags": ["compliance", "regulated"]
+    },
+    {
+      "id": "dr-meso-manual-export",
+      "statement": "Teams manually copy from document stores into spreadsheets because no query layer exists.",
+      "grain": "meso",
+      "category": "interface",
+      "suggestedEvidence": "Workflow and hours per week.",
+      "contextTags": ["integration", "documents"]
+    },
+    {
+      "id": "dr-meso-audit-lineage",
+      "statement": "Field definitions in documents disagree with production data dictionaries.",
+      "grain": "meso",
+      "category": "schema",
+      "suggestedEvidence": "Field pair conflict and downstream impact.",
+      "contextTags": ["schema", "audit"]
+    },
+    {
+      "id": "dr-macro-no-wedge",
+      "statement": "Enterprise KM or 'AI search' RFPs stall; nobody scoped a cited extract for one workflow.",
+      "grain": "macro",
+      "category": "visibility",
+      "suggestedEvidence": "Cancelled RFP or pilot; no funded workstream.",
+      "contextTags": ["strategy", "documents"]
+    },
+    {
+      "id": "dr-meso-sharepoint-sprawl",
+      "statement": "SharePoint or file shares sprawl with duplicate policy versions and no owner.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Duplicate version story; teams affected.",
+      "contextTags": ["sharepoint", "documents"]
+    },
+    {
+      "id": "dr-micro-ocr-quality",
+      "statement": "OCR quality on legacy scans makes automated search untrustworthy for high-risk citations.",
+      "grain": "micro",
+      "category": "knowledge",
+      "suggestedEvidence": "Sample page with bad OCR and business impact.",
+      "contextTags": ["pdf", "documents"]
+    }
+  ]
+}

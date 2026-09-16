@@ -1,0 +1,69 @@
+{
+  "vertical": "infra-platform",
+  "pains": [
+    {
+      "id": "infra-meso-oncall-toil",
+      "statement": "On-call engineers spend most incidents manually correlating logs across systems with no unified trace.",
+      "grain": "meso",
+      "category": "visibility",
+      "suggestedEvidence": "MTTR for last sev-2; tools opened per incident.",
+      "contextTags": ["observability", "on-call"]
+    },
+    {
+      "id": "infra-macro-snowflake-servers",
+      "statement": "Every team runs slightly different Kubernetes or VM patterns—no shared platform contract.",
+      "grain": "macro",
+      "category": "visibility",
+      "suggestedEvidence": "Count cluster flavors or golden images; time to onboard a new service.",
+      "contextTags": ["kubernetes", "vmware", "platform"]
+    },
+    {
+      "id": "infra-meso-runbook-gap",
+      "statement": "Production runbooks are stale; recovery steps live in senior engineers' heads.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Last incident where runbook was wrong or missing.",
+      "contextTags": ["knowledge", "on-call"]
+    },
+    {
+      "id": "infra-micro-alert-fatigue",
+      "statement": "Alert noise hides real failures—pages fire on symptoms nobody owns.",
+      "grain": "micro",
+      "category": "performance",
+      "suggestedEvidence": "Alerts per week; ratio of false positives.",
+      "contextTags": ["observability", "splunk", "datadog"]
+    },
+    {
+      "id": "infra-meso-tf-drift",
+      "statement": "Terraform and manual console changes diverge; nobody trusts the state file.",
+      "grain": "meso",
+      "category": "schema",
+      "suggestedEvidence": "Drift detections per month; last scary apply.",
+      "contextTags": ["terraform", "cloud"]
+    },
+    {
+      "id": "infra-macro-vendor-lock",
+      "statement": "Managed service commitments block incremental platform change.",
+      "grain": "macro",
+      "category": "visibility",
+      "suggestedEvidence": "Contract constraint; smallest change rejected or priced out.",
+      "contextTags": ["vendor", "on-prem"]
+    },
+    {
+      "id": "infra-meso-batch-overlap",
+      "statement": "Batch and cron jobs overlap peak traffic windows because schedules were never revisited.",
+      "grain": "meso",
+      "category": "performance",
+      "suggestedEvidence": "Job window vs traffic peak; what stalls.",
+      "contextTags": ["batch"]
+    },
+    {
+      "id": "infra-meso-no-wedge",
+      "statement": "Leadership wants 'platform modernization' but no fundable first SLO or golden path.",
+      "grain": "meso",
+      "category": "visibility",
+      "suggestedEvidence": "Platform roadmap slide vs funded epics this quarter.",
+      "contextTags": ["strategy"]
+    }
+  ]
+}

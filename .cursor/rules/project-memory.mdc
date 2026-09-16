@@ -1,0 +1,18 @@
+# Buyer Founder — project memory
+
+Marketing site for the solo-founder catalog. Next.js on port 3400.
+
+## What is actually usable from this site
+
+- `/try` — in-browser PainFork wizard. Uses vendored `@painfork/core` at `vendor/painfork-core` (snapshot of PainFork's browser entry). Import `/browser`, never the Node session (`fs`).
+- `/waitlist` — email capture. `POST /api/waitlist` appends to `data/waitlist.jsonl` (gitignored). No public read of emails.
+- `/samples/wedge` — PainFork one-pager generated from the shipped AS/400 example.
+- `/samples/feasibility` — excerpt of the Feasibility Validator demo scan of fullstack-assistant (overall 73, verdict fix-first).
+- `/samples/clauses` — Oak Hollow HOA sample in Clause Finder’s US checklist shape. Not legal advice.
+- Planroom remains the only separately hosted app: `https://planroom-seven.vercel.app`.
+
+## Do not
+
+- Advertise all 14 SKUs as live.
+- Send waitlist emails to mailto as the primary capture.
+- Import `@painfork/core` (root) from client components — it pulls Node `fs`.

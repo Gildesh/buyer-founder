@@ -1,0 +1,69 @@
+{
+  "vertical": "financial-services",
+  "pains": [
+    {
+      "id": "fs-meso-channel-read-failure",
+      "statement": "Mobile or call-center channels cannot present a single authoritative account state after a core migration wave.",
+      "grain": "meso",
+      "category": "interface",
+      "suggestedEvidence": "Incident volume, channel affected, mean time to manual fix.",
+      "contextTags": ["core banking", "mobile", "api"]
+    },
+    {
+      "id": "fs-macro-multi-core",
+      "statement": "The group still operates many legacy core platforms; contract migration did not collapse execution topology.",
+      "grain": "macro",
+      "category": "interface",
+      "suggestedEvidence": "Count active cores; releases required for a simple pricing change.",
+      "contextTags": ["core banking", "integration"]
+    },
+    {
+      "id": "fs-meso-audit-lineage",
+      "statement": "Regulators or internal audit cannot get field-level mutation history for migrated retail contracts.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Regulatory deadline missed; artifact requested vs delivered.",
+      "contextTags": ["compliance", "audit", "regulated"]
+    },
+    {
+      "id": "fs-meso-manual-rekey",
+      "statement": "Agents manually cross-check core banking screens against CRM because no stable read API exists.",
+      "grain": "meso",
+      "category": "interface",
+      "suggestedEvidence": "Handle time increase; tools re-keyed per ticket.",
+      "contextTags": ["integration", "terminal"]
+    },
+    {
+      "id": "fs-macro-cutover-terror",
+      "statement": "Another weekend big-bang migration is blocked after customer-visible payment failures.",
+      "grain": "macro",
+      "category": "cutover",
+      "suggestedEvidence": "Failed direct debits, lockouts, or supervisory action.",
+      "contextTags": ["cutover", "payment rails"]
+    },
+    {
+      "id": "fs-meso-payment-rail",
+      "statement": "Payment instruction files fail silently between heritage and target cores during phased migration.",
+      "grain": "meso",
+      "category": "interface",
+      "suggestedEvidence": "Rejected payments count; file format or cutoff time mismatch.",
+      "contextTags": ["payment rails", "batch", "integration"]
+    },
+    {
+      "id": "fs-macro-compliance-fail",
+      "statement": "Compliance reporting fails on undocumented fee and interest calculation logic spread across cores.",
+      "grain": "macro",
+      "category": "knowledge",
+      "suggestedEvidence": "Last finding or near-miss; rule that could not be evidenced.",
+      "contextTags": ["compliance", "regulated"]
+    },
+    {
+      "id": "fs-meso-maintainer-gap",
+      "statement": "Cannot hire maintainers for dead-stack payment and ledger modules that still settle real money.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Open reqs, contractor dependence, last expert departure.",
+      "contextTags": ["staffing", "legacy-stack"]
+    }
+  ]
+}

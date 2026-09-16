@@ -1,0 +1,614 @@
+[
+  {
+    "id": "ex-as400-slow-modernize",
+    "title": "AS/400 Legacy System: Slow queries & modernization gridlock",
+    "vagueProblem": "Our AS/400 system is too slow. We need to modernize the underlying infrastructure, but we absolutely cannot risk taking production operations offline.",
+    "vertical": "legacy-migration",
+    "contextHints": {
+      "buyerRole": "CTO",
+      "systemAge": "25+ years",
+      "stackHints": ["AS/400", "DB2", "green-screen"],
+      "constraints": ["on-prem", "no big-bang cutover", "regulated ops window"],
+      "notes": "The buyer conflates system age with specific architectural bottlenecks. The actual blockers are surface access (no APIs) and operational fear of a 'big-bang' cutover."
+    },
+    "root": {
+      "id": "ex-as400-root",
+      "grain": "macro",
+      "category": "visibility",
+      "label": "Initial executive mandate",
+      "statement": "Executive summary: The AS/400 mainframe is failing current business needs. Reports are timing out, digital expansion is blocked, and migrating off the platform is deemed too risky.",
+      "dissect": "Avoid proposing APIs or indexing immediately. Deconstruct the monolithic 'system' complaint into actionable constraints: (1) physical read-path latency, (2) the absence of programmatic interfaces, and (3) organizational risk aversion. Each requires a distinct, bounded intervention.",
+      "children": [
+        {
+          "id": "ex-as400-branch-digital",
+          "grain": "meso",
+          "category": "interface",
+          "label": "Thread A — Digital Integration Blocked",
+          "statement": "Strategic digital initiatives (e.g., mobile apps, partner integrations) are halted because the AS/400 architecture relies exclusively on terminal emulation and batch processing.",
+          "dissect": "Identify the specific initiative that failed. The missing architectural component is typically a stable, real-time read/command surface—not a full 'modern UX' rewrite.",
+          "children": [
+            {
+              "id": "ex-as400-leaf-export",
+              "grain": "micro",
+              "category": "interface",
+              "label": "Leaf — Manual synchronization",
+              "statement": "Operations personnel manually export CSVs from terminal screens daily because the legacy system provides no HTTP contract for this workflow.",
+              "painId": "lm-micro-manual-export",
+              "evidence": "Integration engineers spend 12 hours weekly re-keying data from terminal exports; the mobile pilot was suspended in Q2 due to missing APIs.",
+              "severity": "costly"
+            },
+            {
+              "id": "ex-as400-leaf-no-api",
+              "grain": "meso",
+              "category": "interface",
+              "label": "Leaf — Missing API surface",
+              "statement": "The AS/400 core exposes zero HTTP APIs for the critical operator workflows required by the digital team.",
+              "painId": "lm-meso-mobile-blocked",
+              "evidence": "The CTO confirmed the customer portal cannot render live order status, relying instead on a 6:00 AM batch flat-file.",
+              "severity": "blocking"
+            }
+          ]
+        },
+        {
+          "id": "ex-as400-branch-slow",
+          "grain": "meso",
+          "category": "performance",
+          "label": "Thread B — Query contention",
+          "statement": "Analytical and operational reporting queries execute directly against the AS/400 transactional database during peak business hours.",
+          "dissect": "Pinpoint the specific report. Extract runtime, frequency, and subsequent lock/latency metrics. Performance degradation is usually a localized indexing or access-path issue, not a systemic failure of the mainframe.",
+          "children": [
+            {
+              "id": "ex-as400-leaf-slow-report",
+              "grain": "micro",
+              "category": "performance",
+              "label": "Leaf — Bottlenecked reporting",
+              "statement": "The critical daily operations report takes 12+ minutes to execute because index structures were never optimized for contemporary data volumes.",
+              "painId": "lm-micro-slow-reports",
+              "evidence": "The shift supervisor delays the morning standup until the 8:00 AM report completes; average AS/400 runtime is currently 12–18 minutes.",
+              "severity": "blocking"
+            },
+            {
+              "id": "ex-as400-leaf-index",
+              "grain": "micro",
+              "category": "performance",
+              "label": "Leaf — Sequential scanning",
+              "statement": "A high-frequency customer lookup forces full sequential table scans under peak load.",
+              "painId": "lm-micro-shadow-index-gap",
+              "evidence": "DBA telemetry captured full table scans on a 40M-row table for basic account lookups during peak operational windows.",
+              "severity": "costly"
+            },
+            {
+              "id": "ex-as400-leaf-replica",
+              "grain": "meso",
+              "category": "performance",
+              "label": "Leaf — Missing read replication",
+              "statement": "There is no dedicated read replica or materialized architecture to isolate reporting workloads from transactional processing.",
+              "painId": "lm-meso-read-replica-gap",
+              "evidence": "Three dashboards poll the production database simultaneously; a previous replication attempt was rejected as 'too risky' due to lack of isolation guarantees.",
+              "severity": "costly"
+            }
+          ]
+        },
+        {
+          "id": "ex-as400-branch-fear",
+          "grain": "macro",
+          "category": "cutover",
+          "label": "Thread C — Systemic risk aversion",
+          "statement": "The organization fears that a monolithic migration will induce unacceptable downtime; historical rollback failures dominate the culture.",
+          "dissect": "Extract the specific historical failure or operational mandate. This constraint invalidates 'big-bang' replatforming and mandates shadow-comparison or bounded-module architectures.",
+          "children": [
+            {
+              "id": "ex-as400-leaf-cutover",
+              "grain": "macro",
+              "category": "cutover",
+              "label": "Leaf — Monolithic cutover paralysis",
+              "statement": "Organizational terror regarding system availability blocks any incremental change affecting production writes.",
+              "painId": "lm-macro-cutover-terror",
+              "evidence": "A 2019 weekend cutover resulted in a 3-day outage and rollback; current executive policy forbids production write-path alterations until the 2027 hardware contract expires.",
+              "severity": "blocking"
+            }
+          ]
+        }
+      ]
+    },
+    "resolution": {
+      "primaryPatternId": "read-path-modern",
+      "alternatePatternIds": ["screen-map-api", "shadow-compare"],
+      "title": "Decoupled read architecture & targeted API facade",
+      "assumptionBroken": "Resolving legacy bottlenecks mandates comprehensive infrastructure replacement prior to delivering business value.",
+      "approach": "Phase 1: Isolate the bottlenecked reporting access pattern onto a dedicated read replica or materialized view, establishing rigorous latency benchmarks. Phase 2: Deploy an API facade mapping specifically to the green-screen export workflow, strictly avoiding schema alterations. Defer write-path modifications entirely, utilizing shadow traffic comparison to empirically prove safety.",
+      "deliverable": "Architectural design for an isolated read replica; API contract mapping a single terminal workflow; comprehensive latency benchmark analysis; strategic write-path deferral memo.",
+      "scope": "3 weeks",
+      "notThis": "Not a holistic replatforming effort, not an arbitrary caching layer injection, and not a consumer-facing application rewrite.",
+      "edgeInsights": [
+        {
+          "id": "edge-shadow-diff",
+          "title": "Empirical shadow validation pre-modification",
+          "technique": "Differential testing—replicating read paths to compare output determinism (row counts, checksums) against production telemetry.",
+          "whyUnexpected": "Engineers default to index injection. Shadow diffing frequently exposes semantic errors (e.g., misaligned joins) where algorithmic optimization supersedes hardware provisioning.",
+          "howItApplies": "Execute shadow queries parallel to the primary report for 7 days; restrict index deployment until output delta achieves zero variance.",
+          "searchTopics": ["shadow database replication diff", "differential testing legacy SQL", "query result checksum"],
+          "caution": "Shadow throughput must be strictly rate-limited; variance thresholds must be mathematically defined prior to execution."
+        },
+        {
+          "id": "edge-screen-map",
+          "title": "API facade decoupling schema from interface",
+          "technique": "Strangler pattern implementation over terminal emulation (3270). Leveraging intermediate gateways to expose legacy command-line interfaces as RESTful endpoints.",
+          "whyUnexpected": "Product teams presume API generation necessitates schema modernization. A facade layer establishes an HTTP contract rapidly by executing deterministic terminal sequences.",
+          "howItApplies": "Deploy a facade over the singular export workflow blocking the mobile initiative, strictly maintaining the legacy database as the source of truth.",
+          "searchTopics": ["strangler fig legacy API", "3270 screen scraping API gateway", "mainframe API facade github"]
+        },
+        {
+          "id": "edge-analytics-escape",
+          "title": "Decoupled analytical ingestion",
+          "technique": "Asynchronous extraction of legacy datasets into an optimized analytical layer (e.g., DuckDB, Parquet) independent of the transactional core.",
+          "whyUnexpected": "Executive 'modernization' mandates frequently reduce to a desire for contemporary dashboards. Analytical extraction resolves the visibility deficit without risking transactional integrity.",
+          "howItApplies": "When real-time replication faces political friction, implement a scheduled, governed extraction pipeline with strict SLA parameters.",
+          "searchTopics": ["DuckDB legacy extract", "analytics escape migration pattern"],
+          "caution": "Requires rigorous definition of the system of record; extraction drift must be monitored algorithmically."
+        }
+      ]
+    }
+  },
+  {
+    "id": "ex-stale-cache-layer",
+    "title": "Architecture: Stale Cache Layer - Removing misaligned acceleration",
+    "vagueProblem": "System integrity is compromised; end-users observe inaccurate data. A caching layer was introduced for acceleration but exacerbated the unreliability.",
+    "vertical": "legacy-migration",
+    "contextHints": {
+      "buyerRole": "VP Engineering",
+      "systemAge": "15+ years",
+      "stackHints": ["Java services", "Redis", "Oracle"],
+      "constraints": ["on-prem", "integration-heavy"],
+      "notes": "Leadership attributes failure to 'the cache.' Diagnostic focus must shift to cache invalidation topology and undocumented write paths."
+    },
+    "root": {
+      "id": "ex-cache-root",
+      "grain": "macro",
+      "label": "Initial engineering complaint",
+      "statement": "The integration topology is fundamentally unreliable. Inventory metrics and state balances remain inaccurate until asynchronous processes or manual interventions force a refresh.",
+      "dissect": "Data staleness frequently triggers reactive 'expand the cache' or 'rip out the cache' directives. Map the complete state-transfer lifecycle: origin writers, cache readers, eviction logic, and direct-database bypass vectors. The optimal intervention is structural auditing, not infrastructure swapping.",
+      "children": [
+        {
+          "id": "ex-cache-branch-stale",
+          "grain": "micro",
+          "category": "performance",
+          "label": "Thread — State invalidation failure",
+          "statement": "The caching mechanism serves stale data because the eviction topology fails to capture all asynchronous or legacy write paths.",
+          "dissect": "Extract a verifiable failure instance: identify the specific UI component, the desynchronized field, the duration of data staleness, and the manual remediation deployed.",
+          "children": [
+            {
+              "id": "ex-cache-leaf-stale",
+              "grain": "micro",
+              "category": "performance",
+              "label": "Leaf — Desynchronized cache reads",
+              "statement": "Read operations retrieve outdated metrics because the auxiliary cache tier lacks comprehensive invalidation triggers for partial state mutations.",
+              "painId": "lm-micro-stale-cache",
+              "evidence": "Incident #8842: Inventory system displayed 40 available units for 3 hours post-fulfillment; remediation required a manual Redis flush.",
+              "severity": "blocking"
+            }
+          ]
+        },
+        {
+          "id": "ex-cache-branch-bypass",
+          "grain": "meso",
+          "category": "interface",
+          "label": "Thread — Fragmented read contracts",
+          "statement": "Architectural fragmentation: contemporary services query the cache while legacy components poll the database directly, resulting in an inconsistent read contract.",
+          "dissect": "Construct a dependency graph of read operations. Execute a shadow comparison between the direct database output and the cached output for a highly volatile entity.",
+          "children": [
+            {
+              "id": "ex-cache-leaf-rekey",
+              "grain": "meso",
+              "category": "interface",
+              "label": "Leaf — Manual state reconciliation",
+              "statement": "Downstream consumers must manually reconcile state because asynchronous batch extracts contradict cached API responses.",
+              "painId": "lm-meso-manual-rekey",
+              "evidence": "The logistics team allocates 6 hours weekly to manually cross-reference cached snapshot data against the Oracle database truth for SKU allocation.",
+              "severity": "costly"
+            }
+          ]
+        }
+      ]
+    },
+    "resolution": {
+      "primaryPatternId": "shadow-compare",
+      "alternatePatternIds": ["read-path-modern", "documentation-archaeology"],
+      "title": "Empirical cache auditing & targeted deprecation",
+      "assumptionBroken": "Latency degradation inherently requires distributed caching; alternatively, deprecating cache is a high-risk monolithic operation.",
+      "approach": "Phase 1: Deploy a shadow-comparison routine to measure variance between cached and authoritative reads for a specific domain entity (e.g., inventory SKU), mapping all write vectors that bypass invalidation logic. Phase 2: Execute a bounded architectural pivot—deprecate the cache exclusively for the audited entity, replacing it with an optimized read replica utilizing aggressive TTL. Prohibit systemic cache removal without empirical variance data.",
+      "deliverable": "Empirical variance report for the target entity; comprehensive invalidation gap topology; architectural decision record (ADR) analyzing deprecation vs. restriction vs. read-replica replacement.",
+      "scope": "2 weeks",
+      "notThis": "Not a systemic cache deprecation initiative, not a Redis cluster migration, and not a microservices rewrite.",
+      "edgeInsights": [
+        {
+          "id": "edge-cache-audit",
+          "title": "Cache as an untrusted state vector",
+          "technique": "Implementing shadow traffic analysis and consumer-driven contract testing on legacy read paths.",
+          "whyUnexpected": "Caching is traditionally perceived as pure optimization. Empirical shadow testing frequently proves that caching obfuscates underlying schema drift and concurrency bugs.",
+          "howItApplies": "Require empirical proof of cache utility (latency reduction vs. state accuracy) for a specific SKU family prior to authorizing architectural changes.",
+          "searchTopics": ["cache invalidation shadow testing", "read path contract testing legacy"],
+          "caution": "Cache deprecation in production must be gated by a real-time failback mechanism."
+        },
+        {
+          "id": "edge-read-replica",
+          "title": "Governed read-slice architecture",
+          "technique": "Provisioning dedicated read replicas and materialized views for high-frequency queries instead of relying on application-level state caching.",
+          "whyUnexpected": "Engineering teams reflexively deploy key-value stores. A read-only database slice tailored to specific query semantics often yields superior determinism and simplifies cognitive load compared to complex TTL invalidation matrices.",
+          "howItApplies": "If shadow telemetry confirms cache-induced staleness, pilot a read replica exclusively for the compromised entity.",
+          "searchTopics": ["materialized view read model legacy", "read replica reporting oracle"]
+        },
+        {
+          "id": "edge-lineage",
+          "title": "Algorithmic documentation archaeology",
+          "technique": "Utilizing static analysis, dependency mappers, and data lineage scanners to expose undocumented state mutators.",
+          "whyUnexpected": "Cache invalidation failures are rarely application bugs; they are typically caused by undocumented legacy batch routines executing outside the mapped architecture.",
+          "howItApplies": "Augment the shadow comparison with a structured lineage audit to identify 'dark' writers mutating the cached entity.",
+          "searchTopics": ["data lineage undocumented batch jobs", "documentation archaeology legacy"]
+        }
+      ]
+    }
+  },
+  {
+    "id": "ex-modernize-no-wedge",
+    "title": "Strategic impasse: Modernization mandate lacking a bounded wedge",
+    "vagueProblem": "Executive leadership mandates 'modernization,' but the organization lacks a mathematically bounded, actionable first deliverable.",
+    "vertical": "legacy-migration",
+    "contextHints": {
+      "buyerRole": "Program Manager",
+      "systemAge": "30+ years",
+      "stackHints": ["COBOL", "mainframe", "PDF specs"],
+      "constraints": ["compliance", "no source for some modules"],
+      "notes": "A macro-level strategic mandate paralyzed by scope ambiguity. Undocumented institutional knowledge and compliance requirements obscure the optimal entry vector."
+    },
+    "root": {
+      "id": "ex-wedge-root",
+      "grain": "macro",
+      "category": "visibility",
+      "label": "Initial executive mandate",
+      "statement": "The board has issued a modernization directive, but no functional scope has been defined, resulting in multiple abandoned vendor assessments.",
+      "dissect": "An unbounded modernization mandate is a macro-level liability. The objective is to distill this mandate into a fundable, highly constrained artifact: an architectural dependency map, an options ADR, or a structured knowledge corpus—not a multi-year Gantt chart.",
+      "children": [
+        {
+          "id": "ex-wedge-branch-mandate",
+          "grain": "macro",
+          "category": "visibility",
+          "label": "Thread — Ambiguous scope",
+          "statement": "Leadership is unable to define a tightly bounded initial deliverable or assign ownership for incremental architectural change.",
+          "painId": "lm-macro-no-wedge",
+          "evidence": "Corporate strategy documents target 'digital transformation by 2026'; three vendor RFPs have been aborted; zero engineering workstreams are currently funded.",
+          "severity": "blocking",
+          "children": []
+        },
+        {
+          "id": "ex-wedge-branch-docs",
+          "grain": "meso",
+          "category": "knowledge",
+          "label": "Thread — Unstructured legacy knowledge",
+          "statement": "Core business logic is trapped in unstructured formats (PDFs, communications) that defy rapid compliance auditing.",
+          "dissect": "Determine the specific event that necessitated manual archaeological analysis (e.g., an audit failure, a contract dispute, or regulatory inquiry).",
+          "children": [
+            {
+              "id": "ex-wedge-leaf-corpus",
+              "grain": "meso",
+              "category": "knowledge",
+              "label": "Leaf — Opaque compliance corpus",
+              "statement": "Critical operational parameters reside in scanned PDFs and legacy inboxes, preventing rapid citation and verification.",
+              "painId": "lm-meso-doc-corpus",
+              "evidence": "The compliance division failed to meet a 48-hour regulatory inquiry deadline because the defining rule was buried in an unindexed PDF annex.",
+              "severity": "blocking"
+            },
+            {
+              "id": "ex-wedge-leaf-audit",
+              "grain": "meso",
+              "category": "knowledge",
+              "label": "Leaf — Opaque data lineage",
+              "statement": "Regulatory audits require data mutation lineage that the current architecture is mathematically incapable of generating.",
+              "painId": "lm-meso-audit-lineage",
+              "evidence": "The most recent audit resulted in a critical finding: the system could not reconstruct the modification history for tier-1 fee calculation parameters.",
+              "severity": "blocking"
+            }
+          ]
+        }
+      ]
+    },
+    "resolution": {
+      "primaryPatternId": "documentation-archaeology",
+      "alternatePatternIds": ["residue-to-queryable", "bounded-module-cutover"],
+      "title": "Architectural options ADR & cryptographically cited compliance corpus",
+      "assumptionBroken": "Enterprise modernization must commence with cloud vendor selection or holistic language translation (e.g., COBOL to Java).",
+      "approach": "Phase 1: Execute systematic documentation archaeology on the fee-calculation logic—mapping tables, batch jobs, code owners, and algorithmic blast radius. Synthesize into three strictly bounded cutover options structured for executive funding. Phase 2 (Parallel): Ingest the unstructured compliance corpus into a vector database, generating a searchable interface that mandates exact source citation for all regulatory inquiries.",
+      "deliverable": "Algorithmic dependency map; three-option bounded cutover ADR; searchable, cited-extract engine tailored to the primary compliance workflow.",
+      "scope": "3 weeks",
+      "notThis": "Not an RFP for vendor selection, not a multi-year strategic roadmap, and not a generalized LLM chatbot deployment.",
+      "edgeInsights": [
+        {
+          "id": "edge-rag-cited",
+          "title": "Deterministic RAG over generalized chat",
+          "technique": "Retrieval-Augmented Generation (RAG) strictly constrained to output exact source citations—the optimal architectural pattern for heavily regulated domains.",
+          "whyUnexpected": "Executives request 'AI.' Auditors require deterministic proof. A cited extraction pipeline delivers immediate compliance utility faster than a generalized enterprise Knowledge Management system.",
+          "howItApplies": "Vectorize the PDF annexes and inbox data; deploy a QA interface that algorithmically guarantees page-level citations for every audit response.",
+          "searchTopics": ["cited document retrieval compliance", "RAG with citations enterprise documents"],
+          "caution": "Output affecting regulatory posture requires mandatory human-in-the-loop verification; pre-index access controls are non-negotiable."
+        },
+        {
+          "id": "edge-options-memo",
+          "title": "Tripartite bounded cutover ADR",
+          "technique": "Architectural Decision Records outlining strangler-fig applications—a highly effective construct for negotiating with risk-averse leadership.",
+          "whyUnexpected": "Boards expect a singular, monolithic solution. Presenting three mathematically bounded options, each with a defined blast radius, circumvents paralysis and forces tactical funding.",
+          "howItApplies": "The archaeological phase must culminate in a highly constrained 'Option A' executable in 2–4 weeks, avoiding any implication of a multi-year program.",
+          "searchTopics": ["strangler fig case study", "legacy modernization options memo"]
+        },
+        {
+          "id": "edge-synergy-docs-code",
+          "title": "Synthesizing unstructured specs with runtime telemetry",
+          "technique": "Fusing static code analysis and job scheduler telemetry with unstructured document mapping to identify true system boundaries.",
+          "whyUnexpected": "Documentation and execution environments are historically siloed. Algorithmic synthesis of these domains reveals the actual, empirical boundaries of legacy modules, preventing flawed assumptions.",
+          "howItApplies": "Algorithmically link the field definitions extracted from PDFs directly to the runtime batch jobs identified during stakeholder analysis.",
+          "searchTopics": ["legacy dependency graph documentation", "find synergies code documentation migration"]
+        }
+      ]
+    }
+  },
+  {
+    "id": "ex-global-erp-cutover",
+    "title": "Fortune 500: SAP S/4 cutover halts global supply chain",
+    "vagueProblem": "Our new ERP platform is live in North America, but order fulfillment, inventory truth, and distributor shipments are still breaking. Leadership expected a modernization win—not operational paralysis.",
+    "vertical": "legacy-migration",
+    "contextHints": {
+      "buyerRole": "CIO",
+      "systemAge": "20+ years",
+      "stackHints": ["SAP S/4HANA", "Oracle legacy", "EDI", "warehouse APIs"],
+      "constraints": ["regulated medical devices", "global supply chain", "no second big-bang cutover"],
+      "notes": "Pattern mirrors public Fortune-scale ERP failures (e.g., Zimmer Biomet 2024 SAP go-live, Lidl SAP abandonment): premature cutover, incomplete integration inventory, and master-data variance—not a defective product SKU."
+    },
+    "root": {
+      "id": "ex-erp-root",
+      "grain": "macro",
+      "category": "cutover",
+      "label": "Initial executive mandate",
+      "statement": "A $8B+ global manufacturer executed a cloud ERP cutover after multiple delayed go-live dates. Post-launch, critical medical-device shipments stalled, manual workarounds consumed operations, and finance cannot reconcile inventory positions across regions.",
+      "dissect": "This is not generic 'ERP is hard.' Separate (1) cutover execution risk, (2) integration topology gaps around the new core, and (3) master-data semantic mismatch between legacy valuation logic and the new standard. Each thread demands a different bounded wedge—not another transformation program slide deck.",
+      "children": [
+        {
+          "id": "ex-erp-branch-cutover",
+          "grain": "macro",
+          "category": "cutover",
+          "label": "Thread A — Premature production cutover",
+          "statement": "The organization cut over order-to-cash and inventory writes before downstream systems could absorb behavioral differences in the new ERP core.",
+          "dissect": "Extract the go-live decision record: who signed off, what 'showstopper' tests were skipped, and which business process first failed in production (shipment, invoice, or stock allocation).",
+          "children": [
+            {
+              "id": "ex-erp-leaf-cutover",
+              "grain": "macro",
+              "category": "cutover",
+              "label": "Leaf — Post-go-live operational halt",
+              "statement": "Production cutover on the new ERP induced shipment freezes and manual order re-entry because validation windows were compressed under executive deadline pressure.",
+              "painId": "lm-macro-cutover-terror",
+              "evidence": "Go-live slipped four times over 18 months; within 90 days of July cutover, distribution reported unfilled surgical-device orders and $172M+ operational damage cited internally.",
+              "severity": "blocking"
+            }
+          ]
+        },
+        {
+          "id": "ex-erp-branch-integration",
+          "grain": "meso",
+          "category": "interface",
+          "label": "Thread B — Integration inventory incomplete",
+          "statement": "Warehouse, distributor, and regulatory reporting systems were discovered late in the program—integrations entered UAT with insufficient parallel-run time.",
+          "dissect": "Map the integration fan-out: WMS, 3PL EDI, CRM, finance consolidation, and compliance feeds. Late-discovered adapters are the dominant failure mode in Fortune-scale ERP programs.",
+          "children": [
+            {
+              "id": "ex-erp-leaf-integration",
+              "grain": "macro",
+              "category": "interface",
+              "label": "Leaf — Point-to-point web",
+              "statement": "Dozens of point-to-point integrations mean any ERP schema or pricing rule change becomes a multi-team coordination event with no authoritative contract layer.",
+              "painId": "lm-macro-integration-debt",
+              "evidence": "Integration lead counted 47 production adapters; three WMS feeds were not in the original cutover scope and failed on week two.",
+              "severity": "blocking"
+            },
+            {
+              "id": "ex-erp-leaf-rekey",
+              "grain": "meso",
+              "category": "interface",
+              "label": "Leaf — Manual reconciliation loop",
+              "statement": "Operations teams manually reconcile ERP inventory snapshots against warehouse truth because batch interfaces disagree on SKU availability.",
+              "painId": "lm-meso-manual-rekey",
+              "evidence": "Regional ops spends 20+ hours weekly re-keying allocation exceptions between SAP and legacy warehouse flat files.",
+              "severity": "costly"
+            }
+          ]
+        },
+        {
+          "id": "ex-erp-branch-data",
+          "grain": "meso",
+          "category": "schema",
+          "label": "Thread C — Master-data semantic drift",
+          "statement": "Legacy valuation and unit-of-measure conventions were migrated without resolving semantic conflicts—reports look correct until fulfillment executes.",
+          "dissect": "Ask which field pair broke first: purchase price vs retail price, pack size vs sellable unit, or region-specific tax category. Lidl-scale failures often start as a single semantic mismatch amplified by customization.",
+          "children": [
+            {
+              "id": "ex-erp-leaf-field",
+              "grain": "micro",
+              "category": "schema",
+              "label": "Leaf — Silent field collision",
+              "statement": "Two product attributes share labels in different modules but encode different commercial meanings, causing silent allocation errors post-migration.",
+              "painId": "lm-micro-field-collision",
+              "evidence": "Fulfillment team found 'unit price' in legacy meant distributor list price; in S/4 it mapped to internal transfer price—skewing allocation for 1,200 SKUs.",
+              "severity": "blocking"
+            }
+          ]
+        }
+      ]
+    },
+    "resolution": {
+      "primaryPatternId": "shadow-compare",
+      "alternatePatternIds": ["bounded-module-cutover", "documentation-archaeology"],
+      "title": "Shadow-run order-to-cash for one region before expanding ERP scope",
+      "assumptionBroken": "A successful ERP license deployment implies production readiness; residual integration and data semantics can be resolved after go-live.",
+      "approach": "Phase 1: Freeze scope expansion. Run shadow comparison on order-to-cash for a single product family—mirror orders, shipments, and inventory deltas against legacy for a full business cycle with explicit acceptance thresholds. Phase 2: Produce an integration blast-radius map and a bounded-module cutover charter for warehouse feeds only. Phase 3: Documentation archaeology on the top three semantic field collisions with a priced remediation path.",
+      "deliverable": "Shadow diff dashboard for one product family; integration contract map with cutover sequencing; field semantic dictionary for conflicting product attributes; executive memo defining what will not be migrated this fiscal year.",
+      "scope": "4 weeks",
+      "notThis": "Not a second global go-live, not an SAP re-implementation RFP, and not a change-management training rollout.",
+      "edgeInsights": [
+        {
+          "id": "edge-erp-shadow",
+          "title": "Parallel-run as regulatory-grade evidence",
+          "technique": "Shadow traffic replay and financial reconciliation pipelines—now standard in post-mortems of Hershey, Nike, and Zimmer-scale ERP launches.",
+          "whyUnexpected": "Program offices treat parallel run as schedule drag; empirically it is the cheapest insurance against nine-figure operational loss.",
+          "howItApplies": "Instrument one region's order flow; block scope expansion until variance stays inside pre-agreed bounds for 30 consecutive days.",
+          "searchTopics": ["ERP parallel run shadow reconciliation", "S/4HANA cutover testing patterns", "order-to-cash shadow compare"],
+          "caution": "Shadow environments must not mutate production financials; define rounding and timing tolerances before execution."
+        },
+        {
+          "id": "edge-erp-integration-inventory",
+          "title": "Integration discovery before cutover sign-off",
+          "technique": "Automated dependency scanning plus stakeholder workshops to build a complete integration inventory—Cyflogic pattern audit for ERP modernization.",
+          "whyUnexpected": "Teams assume ERP is the center; the failure is usually an undocumented 3PL adapter discovered in week one of production.",
+          "howItApplies": "Deliver a ranked integration heat map before any further module cutover is authorized.",
+          "searchTopics": ["ERP integration inventory discovery", "WMS EDI adapter mapping enterprise"]
+        },
+        {
+          "id": "edge-erp-data-semantics",
+          "title": "Semantic data dictionary over bulk migration",
+          "technique": "Field-level semantic mapping with business-defined golden records instead of volume-first ETL.",
+          "whyUnexpected": "Migration teams optimize row counts; fulfillment failures trace to one mislabeled commercial attribute.",
+          "howItApplies": "Resolve the top three colliding attributes before touching pricing or allocation modules again.",
+          "searchTopics": ["ERP master data semantic mapping", "Lidl SAP retail price mismatch lesson"]
+        }
+      ]
+    }
+  },
+  {
+    "id": "ex-tier1-bank-core-stack",
+    "title": "Tier-1 bank: 15 legacy core systems after Postbank-scale migration",
+    "vagueProblem": "We finished migrating millions of retail contracts onto our group platform, but customers are locked out, direct debits fail, and call centers cannot see account state. Regulators are now inside the building.",
+    "vertical": "legacy-migration",
+    "contextHints": {
+      "buyerRole": "Head of Retail Technology",
+      "systemAge": "30+ years",
+      "stackHints": ["core banking", "Postbank heritage", "payment rails", "call-center CRM"],
+      "constraints": ["BaFin oversight", "19M retail contracts", "zero downtime mandate"],
+      "notes": "Pattern mirrors Deutsche Bank Postbank Unity integration (2023): big-bang data moves without modernizing the underlying 15-system core stack—customer-visible failure after 'technical completion.'"
+    },
+    "root": {
+      "id": "ex-bank-root",
+      "grain": "macro",
+      "category": "interface",
+      "label": "Initial executive mandate",
+      "statement": "A tier-1 European bank declared a multi-year retail migration 'complete' after moving 12M+ customer contracts and tens of billions of data sets. Within weeks, regulators cited unacceptable outages: account lockouts, rejected payments, and unreachable support channels.",
+      "dissect": "Distinguish (1) customer-visible read-path failure, (2) fragmented core topology (many legacy cores pretending to be one), and (3) compliance exposure when audit lineage cannot be produced under deadline. These are architectural pains—not a marketing problem about 'digital banking.'",
+      "children": [
+        {
+          "id": "ex-bank-branch-customer",
+          "grain": "meso",
+          "category": "interface",
+          "label": "Thread A — Customer read path broken",
+          "statement": "Digital channels and call-center tooling cannot present a single authoritative account state during the post-migration window.",
+          "dissect": "Identify which channel failed first: mobile login, balance display, direct debit, or card authorization. Capture incident volume and mean time to manual remediation.",
+          "children": [
+            {
+              "id": "ex-bank-leaf-mobile",
+              "grain": "meso",
+              "category": "interface",
+              "label": "Leaf — Channel cannot read live core",
+              "statement": "The retail mobile application cannot retrieve consistent account balances because the integration layer still fans out to multiple legacy core endpoints.",
+              "painId": "lm-meso-mobile-blocked",
+              "evidence": "Nearly 10,000 regulatory complaints in 90 days; customers reported inaccessible funds and failed direct debits after the final migration wave.",
+              "severity": "blocking"
+            },
+            {
+              "id": "ex-bank-leaf-rekey",
+              "grain": "meso",
+              "category": "interface",
+              "label": "Leaf — Call-center manual reconciliation",
+              "statement": "Agents manually cross-check core banking screens against CRM notes because no stable read API exists for merged customer contracts.",
+              "painId": "lm-meso-manual-rekey",
+              "evidence": "Average handle time increased 40%; agents re-key account identifiers across three internal tools per ticket.",
+              "severity": "costly"
+            }
+          ]
+        },
+        {
+          "id": "ex-bank-branch-core",
+          "grain": "macro",
+          "category": "interface",
+          "label": "Thread B — Fifteen cores masquerading as one",
+          "statement": "The group still operates ~15 core banking platforms; the migration moved contracts without collapsing the execution topology.",
+          "dissect": "Map which products still settle on heritage Postbank rails vs group rails. Parallel-run and strangler patterns only work once boundaries are honest.",
+          "children": [
+            {
+              "id": "ex-bank-leaf-integration",
+              "grain": "macro",
+              "category": "interface",
+              "label": "Leaf — Integration debt at scale",
+              "statement": "Every product launch or regulatory rule change requires coordinated releases across a web of legacy cores and middleware buses.",
+              "painId": "lm-macro-integration-debt",
+              "evidence": "Architecture review listed 15 active core platforms targeted for reduction to 2; any pricing change still touches 6 release trains.",
+              "severity": "blocking"
+            }
+          ]
+        },
+        {
+          "id": "ex-bank-branch-regulator",
+          "grain": "meso",
+          "category": "knowledge",
+          "label": "Thread C — Regulatory lineage gap",
+          "statement": "Under supervisory pressure, the bank cannot rapidly produce field-level change history for migrated contracts.",
+          "dissect": "Extract the exact artifact the regulator requested and the SLA missed. Lineage gaps turn technical debt into supervisory action.",
+          "children": [
+            {
+              "id": "ex-bank-leaf-audit",
+              "grain": "meso",
+              "category": "knowledge",
+              "label": "Leaf — Audit lineage failure",
+              "statement": "Audit teams cannot reconstruct who changed fee and interest parameters across merged contract databases.",
+              "painId": "lm-meso-audit-lineage",
+              "evidence": "Special monitor appointment followed; compliance could not produce mutation history for migrated savings contracts within the 48-hour regulatory window.",
+              "severity": "blocking"
+            }
+          ]
+        }
+      ]
+    },
+    "resolution": {
+      "primaryPatternId": "strangler-facade",
+      "alternatePatternIds": ["shadow-compare", "documentation-archaeology"],
+      "title": "Customer read facade over one product line with shadow verification",
+      "assumptionBroken": "Contract migration onto a shared platform equals architectural consolidation; read paths can remain fragmented indefinitely without customer impact.",
+      "approach": "Phase 1: Deploy a strangler facade that owns read queries for one high-volume retail product (e.g., standard savings accounts)—route digital and call-center traffic through a single HTTP contract while legacy cores remain behind it. Phase 2: Shadow-compare facade responses against each heritage core for 30 days before expanding scope. Phase 3: Documentation archaeology on fee-parameter lineage for the migrated cohort to close the regulatory finding.",
+      "deliverable": "Facade API contract + routing map for one product line; shadow comparison report with payment and balance thresholds; lineage appendix for fee parameters on migrated contracts; phased core reduction memo (15→2) with explicit non-goals for this year.",
+      "scope": "4 weeks",
+      "notThis": "Not a decade-long core replacement RFP, not a mobile app rewrite, and not another big-bang weekend migration.",
+      "edgeInsights": [
+        {
+          "id": "edge-bank-strangler",
+          "title": "Strangler facade before core replacement",
+          "technique": "Thought Machine / Vault Core-style programs succeed when a facade stabilizes customer read paths first—Deutsche Bank's stated 15→2 core strategy follows this sequencing.",
+          "whyUnexpected": "Banks buy 'new core' platforms; customer incidents persist until read traffic is unified behind a deterministic contract.",
+          "howItApplies": "Pilot facade on savings balances and direct-debit status only; defer write migration until shadow metrics stabilize.",
+          "searchTopics": ["core banking strangler facade", "Vault Core phased migration", "retail banking API gateway legacy"]
+        },
+        {
+          "id": "edge-bank-shadow",
+          "title": "Supervisory-grade shadow comparison",
+          "technique": "Parallel-run account state comparison across heritage and target cores—mandated pattern after Postbank-scale incidents.",
+          "whyUnexpected": "Migration programs mark 'technical complete' while customer-visible read paths still fan out to multiple systems.",
+          "howItApplies": "Run daily diff on balances and payment instructions for the migrated cohort; block channel marketing until variance is nil.",
+          "searchTopics": ["core banking parallel run migration", "payment instruction shadow diff", "BaFin IT migration oversight"],
+          "caution": "Customer communications must be staged; do not promise 'migration complete' until read facade metrics pass."
+        },
+        {
+          "id": "edge-bank-lineage",
+          "title": "Lineage archaeology under regulatory clock",
+          "technique": "Field-level lineage extraction from legacy cores plus migration audit logs—faster than waiting for the next core vendor wave.",
+          "whyUnexpected": "Regulators care about mutation history, not cloud-native slogans; a cited lineage pack can close a finding while core replacement continues.",
+          "howItApplies": "Deliver fee-parameter lineage for one contract type inside the supervisory deadline.",
+          "searchTopics": ["banking audit field lineage", "core banking migration regulatory remediation"]
+        }
+      ]
+    }
+  }
+]
+

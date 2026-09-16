@@ -1,0 +1,110 @@
+{
+  "verticals": [
+    {
+      "id": "legacy-migration",
+      "label": "Legacy migration & modernization",
+      "description": "Mainframes, green-screen, bounded cutover"
+    },
+    {
+      "id": "enterprise-erp",
+      "label": "Enterprise ERP & supply chain",
+      "description": "SAP, Oracle, WMS, go-live risk"
+    },
+    {
+      "id": "financial-services",
+      "label": "Financial services & core banking",
+      "description": "Retail banking, payments, regulatory"
+    },
+    {
+      "id": "infra-platform",
+      "label": "Infra & platform engineering",
+      "description": "On-call, observability, cloud debt"
+    },
+    {
+      "id": "data-residue",
+      "label": "Data residue & document corpora",
+      "description": "PDFs, scans, municipal, compliance search"
+    }
+  ],
+  "buyerRoles": [
+    "CTO",
+    "CIO",
+    "VP Engineering",
+    "Head of Retail Technology",
+    "Program Manager",
+    "Ops lead",
+    "Platform lead",
+    "Engineering manager",
+    "Chief Architect",
+    "Product owner (internal tools)",
+    "Compliance officer",
+    "CFO (cost owner)"
+  ],
+  "systemAges": [
+    "5–10 years",
+    "10–15 years",
+    "15–20 years",
+    "20–25 years",
+    "25+ years",
+    "30+ years",
+    "Unknown / mixed estate"
+  ],
+  "stackHints": [
+    "AS/400",
+    "IBM i",
+    "DB2",
+    "COBOL",
+    "Mainframe",
+    "Green-screen",
+    "3270",
+    "SAP S/4HANA",
+    "SAP ECC",
+    "Oracle ERP",
+    "Java services",
+    "Redis",
+    "PostgreSQL",
+    "SQL Server",
+    "Core banking",
+    "Payment rails",
+    "EDI",
+    "WMS",
+    "Kubernetes",
+    "VMware",
+    "Terraform",
+    "Splunk",
+    "Datadog",
+    "PDF corpus",
+    "SharePoint",
+    "COBOL batch",
+    ".NET Framework",
+    "WebLogic"
+  ],
+  "constraints": [
+    "on-prem",
+    "regulated",
+    "HIPAA",
+    "PCI",
+    "SOX",
+    "no big-bang cutover",
+    "zero downtime mandate",
+    "no source code",
+    "vendor lock-in",
+    "union / ops window",
+    "EU data residency",
+    "air-gapped",
+    "green-screen operators",
+    "global supply chain",
+    "BaFin / supervisory oversight",
+    "fixed-price SOW only"
+  ],
+  "notePrompts": [
+    "Buyer leads with speed but real blocker is cutover fear",
+    "Post-go-live ERP — shipments still breaking",
+    "Regulator inside the building after migration",
+    "Mobile initiative blocked — no stable API",
+    "Cache layer made wrong numbers worse",
+    "Board wants modernization but no first wedge",
+    "On-call toil from missing observability",
+    "PDF/email corpus failed audit deadline"
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "vertical": "legacy-migration",
+  "pains": [
+    {
+      "id": "lm-micro-slow-reports",
+      "statement": "Critical reports and queries take minutes or hours because indexes and access paths were never tuned for today's load.",
+      "grain": "micro",
+      "category": "performance",
+      "suggestedEvidence": "Name a report or screen, typical runtime, and whether ops waits on it daily.",
+      "parentMacroId": "lm-macro-leadership-blind",
+      "contextTags": ["db", "batch", "reporting"]
+    },
+    {
+      "id": "lm-micro-stale-cache",
+      "statement": "Reads return stale or wrong data because cache layers were bolted on without clear invalidation rules.",
+      "grain": "micro",
+      "category": "performance",
+      "suggestedEvidence": "Describe a case where users saw wrong balances, counts, or status until a manual refresh.",
+      "parentMacroId": "lm-meso-mobile-blocked",
+      "contextTags": ["cache", "integration"]
+    },
+    {
+      "id": "lm-micro-batch-overlap",
+      "statement": "Nightly batch jobs overlap business hours and lock tables while operators still need the system.",
+      "grain": "micro",
+      "category": "performance",
+      "suggestedEvidence": "Name the job window, what gets locked, and what business process stalls.",
+      "parentMacroId": "lm-macro-cutover-terror",
+      "contextTags": ["batch", "on-prem"]
+    },
+    {
+      "id": "lm-micro-field-collision",
+      "statement": "Two fields share a name or label but mean different things across modules, causing silent data errors.",
+      "grain": "micro",
+      "category": "schema",
+      "suggestedEvidence": "Give an example field pair and the downstream report or integration that breaks.",
+      "parentMacroId": "lm-meso-audit-lineage",
+      "contextTags": ["schema", "data-quality"]
+    },
+    {
+      "id": "lm-micro-undocumented-proc",
+      "statement": "Business logic lives in undocumented stored procedures nobody dares to change.",
+      "grain": "micro",
+      "category": "knowledge",
+      "suggestedEvidence": "Name a procedure or job and what business rule it encodes that nobody can explain.",
+      "parentMacroId": "lm-meso-maintainer-gap",
+      "contextTags": ["db", "knowledge"]
+    },
+    {
+      "id": "lm-micro-manual-export",
+      "statement": "Teams export CSVs from green screens or ad-hoc queries because there is no stable read API.",
+      "grain": "micro",
+      "category": "interface",
+      "suggestedEvidence": "Which workflow exports data manually and how often per week.",
+      "parentMacroId": "lm-meso-mobile-blocked",
+      "contextTags": ["terminal", "integration"]
+    },
+    {
+      "id": "lm-micro-shadow-index-gap",
+      "statement": "A single high-traffic lookup lacks the right index and forces full scans under peak load.",
+      "grain": "micro",
+      "category": "performance",
+      "suggestedEvidence": "Identify the lookup key, table size, and observed scan vs index behavior.",
+      "parentMacroId": "lm-micro-slow-reports",
+      "contextTags": ["db", "indexing"]
+    },
+    {
+      "id": "lm-meso-mobile-blocked",
+      "statement": "A mobile or digital initiative is blocked because the legacy core exposes no HTTP APIs.",
+      "grain": "meso",
+      "category": "interface",
+      "suggestedEvidence": "Name the initiative, target channel, and what API or screen access is missing.",
+      "contextTags": ["api", "mobile", "digital"]
+    },
+    {
+      "id": "lm-meso-green-screen",
+      "statement": "Operator workflows still require green-screen or terminal UI that new hires refuse to learn.",
+      "grain": "meso",
+      "category": "interface",
+      "suggestedEvidence": "Name the workflow, headcount affected, and hiring or training friction.",
+      "contextTags": ["terminal", "green-screen"]
+    },
+    {
+      "id": "lm-meso-maintainer-gap",
+      "statement": "The organization cannot hire or retain maintainers for the dead stack that runs revenue workflows.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Stack name, open reqs, contractor dependence, or last expert departure.",
+      "contextTags": ["staffing", "legacy-stack"]
+    },
+    {
+      "id": "lm-meso-manual-rekey",
+      "statement": "Integrations require manual re-keying between systems because batch files lack stable schemas.",
+      "grain": "meso",
+      "category": "interface",
+      "suggestedEvidence": "Name the systems, file format, and hours spent per week on re-keying.",
+      "contextTags": ["integration", "batch"]
+    },
+    {
+      "id": "lm-meso-audit-lineage",
+      "statement": "Audit or compliance needs field lineage and change history the current system cannot produce.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Name the audit rule, missing lineage artifact, and last failed or painful audit.",
+      "contextTags": ["compliance", "audit", "regulated"]
+    },
+    {
+      "id": "lm-meso-cutover-module",
+      "statement": "One bounded business module is ready to migrate but leadership fears touching adjacent workflows.",
+      "grain": "meso",
+      "category": "cutover",
+      "suggestedEvidence": "Name the module boundary, dependencies, and what makes adjacent areas scary.",
+      "contextTags": ["cutover", "module"]
+    },
+    {
+      "id": "lm-meso-read-replica-gap",
+      "statement": "Analytics and ops reporting hammer the transactional database because no read path exists.",
+      "grain": "meso",
+      "category": "performance",
+      "suggestedEvidence": "Name reports hitting prod, lock or latency impact, and any rejected replica attempt.",
+      "contextTags": ["reporting", "db", "analytics"]
+    },
+    {
+      "id": "lm-meso-doc-corpus",
+      "statement": "Critical specs live in PDFs, emails, and binders that nobody can search or cite under deadline.",
+      "grain": "meso",
+      "category": "knowledge",
+      "suggestedEvidence": "Corpus type, search failure story, and deadline that forced manual archaeology.",
+      "contextTags": ["documents", "pdf", "knowledge"]
+    },
+    {
+      "id": "lm-macro-no-wedge",
+      "statement": "Leadership says \"we need to modernize\" but has no scoped wedge or bounded first deliverable.",
+      "grain": "macro",
+      "category": "visibility",
+      "suggestedEvidence": "Quote the modernization mandate and list stalled initiatives with no owner.",
+      "contextTags": ["strategy", "leadership"]
+    },
+    {
+      "id": "lm-macro-cutover-terror",
+      "statement": "Cutover terror blocks progress — teams fear a one-shot migration will halt operations.",
+      "grain": "macro",
+      "category": "cutover",
+      "suggestedEvidence": "Past failed cutover, rollback story, or explicit \"we cannot go down\" constraint.",
+      "contextTags": ["cutover", "risk"]
+    },
+    {
+      "id": "lm-macro-leadership-blind",
+      "statement": "Leadership is blind to operations data trapped in legacy screens and batch outputs.",
+      "grain": "macro",
+      "category": "visibility",
+      "suggestedEvidence": "Decision delayed because data was unavailable or took days to assemble.",
+      "contextTags": ["visibility", "reporting"]
+    },
+    {
+      "id": "lm-macro-compliance-fail",
+      "statement": "Compliance is failing or at risk on an undocumented system with no authoritative data dictionary.",
+      "grain": "macro",
+      "category": "knowledge",
+      "suggestedEvidence": "Regulation, finding or near-miss, and artifact auditors asked for but could not get.",
+      "contextTags": ["compliance", "regulated"]
+    },
+    {
+      "id": "lm-macro-vendor-lock",
+      "statement": "Vendor lock-in on legacy runtime or license terms blocks incremental change.",
+      "grain": "macro",
+      "category": "visibility",
+      "suggestedEvidence": "Vendor, contract constraint, and smallest change that was rejected or priced out.",
+      "contextTags": ["vendor", "on-prem"]
+    },
+    {
+      "id": "lm-macro-no-source",
+      "statement": "Source code or build artifacts are missing, so changes require reverse engineering or screen scraping.",
+      "grain": "macro",
+      "category": "knowledge",
+      "suggestedEvidence": "What is missing, last change attempt, and workaround used today.",
+      "contextTags": ["no-source", "knowledge"]
+    },
+    {
+      "id": "lm-macro-integration-debt",
+      "statement": "A web of point-to-point integrations makes any schema change a multi-team coordination event.",
+      "grain": "macro",
+      "category": "interface",
+      "suggestedEvidence": "Count integrations, recent schema change delay, and teams involved.",
+      "contextTags": ["integration"]
+    }
+  ]
+}
