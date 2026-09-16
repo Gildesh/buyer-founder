@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { TrackSampleView } from "@/components/TrackSampleView";
 
 export const metadata: Metadata = {
   title: "Sample restriction checklist",
@@ -56,6 +57,7 @@ const canI = [
 export default function SampleClausesPage() {
   return (
     <article style={{ padding: "120px 24px 80px" }}>
+      <TrackSampleView sample="clauses" />
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <Link href="/samples" style={{ fontSize: 14, color: "#8a8278" }}>
           ← All samples

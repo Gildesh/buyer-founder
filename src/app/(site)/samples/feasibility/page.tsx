@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { TrackSampleView } from "@/components/TrackSampleView";
 
 export const metadata: Metadata = {
   title: "Sample feasibility report",
@@ -47,6 +48,7 @@ const findings = [
 export default function SampleFeasibilityPage() {
   return (
     <article style={{ padding: "120px 24px 80px" }}>
+      <TrackSampleView sample="feasibility" />
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <Link href="/samples" style={{ fontSize: 14, color: "#8a8278" }}>
           ← All samples

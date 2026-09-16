@@ -5,7 +5,11 @@ Marketing site for the solo-founder catalog. Next.js on port 3400.
 ## What is actually usable from this site
 
 - `/try` — in-browser PainFork wizard. Uses vendored `@painfork/core` at `vendor/painfork-core` (snapshot of PainFork's browser entry). Import `/browser`, never the Node session (`fs`).
-- `/waitlist` — email capture. `POST /api/waitlist` appends to `data/waitlist.jsonl` (gitignored). No public read of emails.
+- `/waitlist` — email capture. `POST /api/waitlist` writes to Supabase `waitlist_signups` when `SUPABASE_URL` + `SUPABASE_ANON_KEY` are set; otherwise appends to `data/waitlist.jsonl` locally (gitignored). No public read of emails.
+- `/l/[slug]` — campaign landings (minimal nav). Config in `src/lib/campaigns.ts`.
+- `/pain/[slug]` — SEO pain-intent pages. Config in `src/lib/pain-pages.ts`.
+- Analytics: `@vercel/analytics` + optional GA/Meta via `NEXT_PUBLIC_*` env vars. Events: `waitlist_signup`, `try_example_loaded`, `try_wedge_exported`, `sample_view`, `campaign_view`.
+- UTM params (`utm_source`, `utm_medium`, `utm_campaign`) stored in cookies (`bf_utm_*`) and attached to waitlist signups.
 - `/samples/wedge` — PainFork one-pager generated from the shipped AS/400 example.
 - `/samples/feasibility` — excerpt of the Feasibility Validator demo scan of fullstack-assistant (overall 73, verdict fix-first).
 - `/samples/clauses` — Oak Hollow HOA sample in Clause Finder’s US checklist shape. Not legal advice.

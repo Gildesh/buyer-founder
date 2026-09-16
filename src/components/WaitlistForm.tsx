@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
+import { trackEvent } from "@/lib/analytics";
 import { products } from "@/lib/products";
 import { WAITLIST_PLANS } from "@/lib/waitlist";
+import { readUtmFromCookies } from "@/lib/utm";
 
 const inputStyle: CSSProperties = {
   marginTop: 6,
@@ -40,10 +42,20 @@ export function WaitlistForm({
     setStatus("saving");
     setMessage("");
     try {
+      const utm = readUtmFromCookies();
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, product, plan, source, website }),
+        body: JSON.stringify({
+          email,
+          product,
+          plan,
+          source,
+          website,
+          utmSource: utm.utmSource,
+          utmMedium: utm.utmMedium,
+          utmCampaign: utm.utmCampaign,
+        }),
       });
       const data = (await res.json()) as { status?: string; error?: string };
       if (!res.ok) {
@@ -51,7 +63,15 @@ export function WaitlistForm({
         setMessage(data.error ?? "Could not join the waitlist.");
         return;
       }
-      setStatus(data.status === "exists" ? "exists" : "added");
+      const nextStatus = data.status === "exists" ? "exists" : "added";
+      setStatus(nextStatus);
+      if (nextStatus === "added") {
+        trackEvent("waitlist_signup", {
+          product: product || "general",
+          plan: plan || "waitlist",
+          source,
+        });
+      }
     } catch {
       setStatus("error");
       setMessage("Network error. Try again, or email hello@buyerfounder.com.");

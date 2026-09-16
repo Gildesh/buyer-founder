@@ -20,8 +20,22 @@ npm run dev
 Open [http://localhost:3400](http://localhost:3400).
 
 - **Try PainFork:** `/try` — uses vendored `@painfork/core` in `vendor/painfork-core`.
-- **Waitlist:** `POST /api/waitlist` appends to `data/waitlist.jsonl` locally (gitignored). On Vercel the filesystem is not writable, so the API returns 503 and the form tells people to email hello@buyerfounder.com.
+- **Waitlist:** `POST /api/waitlist`. Without Supabase env vars, signups append to `data/waitlist.jsonl` (gitignored). With `SUPABASE_URL` + `SUPABASE_ANON_KEY`, signups persist to `waitlist_signups` (see `supabase/migrations/`).
 - **Samples:** `/samples/wedge`, `/samples/feasibility`, `/samples/clauses`.
+- **Campaign landings:** `/l/painfork-anti-hype`, `/l/clause-finder-search` (minimal nav, UTM-friendly).
+- **SEO pain pages:** `/pain/hoa-restrictions`, `/pain/legacy-modernization-wedge`.
+
+## Environment
+
+Copy `.env.example` to `.env.local` for local overrides. Production (Vercel) needs at minimum:
+
+| Variable | Purpose |
+|----------|---------|
+| `SUPABASE_URL` | Waitlist persistence |
+| `SUPABASE_ANON_KEY` | Insert-only waitlist via RLS |
+| `NEXT_PUBLIC_SITE_URL` | Sitemap, OG, canonical URLs |
+
+Optional: `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_META_PIXEL_ID` for conversion pixels. Vercel Analytics is enabled by default via `@vercel/analytics`.
 
 ## Deploy
 
@@ -32,6 +46,8 @@ npm run build
 npx vercel --prod
 ```
 
+After adding Supabase env vars in the Vercel project settings, redeploy so `/api/waitlist` works in production.
+
 ## Edit products
 
-Product data lives in `src/lib/products.ts`. Update descriptions, pricing, and CTAs there.
+Product data lives in `src/lib/products.ts`. Campaign copy: `src/lib/campaigns.ts`. Pain SEO pages: `src/lib/pain-pages.ts`.

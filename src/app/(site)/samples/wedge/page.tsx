@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { exportMarkdown } from "@painfork/core/browser";
+import { TrackSampleView } from "@/components/TrackSampleView";
 import { buildExampleWedge } from "@/lib/example-wedge";
 export const metadata: Metadata = {
   title: "Sample wedge one-pager",
@@ -13,6 +14,7 @@ export default function SampleWedgePage() {
 
   return (
     <article style={{ padding: "120px 24px 80px" }}>
+      <TrackSampleView sample="wedge" />
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <Link href="/samples" style={{ fontSize: 14, color: "#8a8278" }}>
           ← All samples

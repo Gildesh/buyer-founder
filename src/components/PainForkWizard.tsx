@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { trackEvent } from "@/lib/analytics";
 import {
   addCustomPain,
   appendNote,
@@ -113,6 +114,7 @@ export function PainForkWizard() {
     const withShifts = setShifts(applied, forkAll(applied.pains, applied.context));
     setSession(withShifts);
     setStep(3);
+    trackEvent("try_example_loaded", { example: EXAMPLE_ID });
   }
 
   function excavate() {
@@ -557,6 +559,7 @@ export function PainForkWizard() {
                     a.download = "wedge.md";
                     a.click();
                     URL.revokeObjectURL(url);
+                    trackEvent("try_wedge_exported", { example: EXAMPLE_ID });
                   }}
                   className="glow-ember"
                   style={{

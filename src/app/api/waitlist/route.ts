@@ -61,6 +61,12 @@ export async function POST(request: Request) {
     typeof record.plan === "string" && isWaitlistPlan(record.plan) ? record.plan : "";
   const source =
     typeof record.source === "string" ? record.source.trim().slice(0, 80) : "waitlist";
+  const utmSource =
+    typeof record.utmSource === "string" ? record.utmSource.trim().slice(0, 120) : undefined;
+  const utmMedium =
+    typeof record.utmMedium === "string" ? record.utmMedium.trim().slice(0, 120) : undefined;
+  const utmCampaign =
+    typeof record.utmCampaign === "string" ? record.utmCampaign.trim().slice(0, 120) : undefined;
 
   try {
     const status = await appendWaitlist({
@@ -68,16 +74,29 @@ export async function POST(request: Request) {
       product,
       plan,
       source,
+      utmSource,
+      utmMedium,
+      utmCampaign,
       createdAt: new Date().toISOString(),
     });
     return NextResponse.json({ ok: true, status });
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
+    const message = error instanceof Error ? error.message : "";
     if (code === "EROFS" || code === "EPERM" || code === "EACCES") {
       return NextResponse.json(
         {
           error:
             "This deploy cannot persist the waitlist file. Run locally, or email hello@buyerfounder.com.",
+        },
+        { status: 503 },
+      );
+    }
+    if (message === "SUPABASE_NOT_CONFIGURED") {
+      return NextResponse.json(
+        {
+          error:
+            "Waitlist storage is not configured on this deploy. Email hello@buyerfounder.com and we will add you manually.",
         },
         { status: 503 },
       );
